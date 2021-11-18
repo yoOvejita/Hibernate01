@@ -4,10 +4,14 @@
  */
 package com.proyecto.proyectohibernate1;
 
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 /**
  *
@@ -21,6 +25,8 @@ public class Producto {
       private String descripcion;
       private String codigo;
       private float precio_unitario;
+      @OneToMany(fetch = FetchType.LAZY, mappedBy = "productoRelaciondo")
+      private Set<RegistroVenta> registros = new HashSet<RegistroVenta>(0);
 
     public int getIdProducto() {
         return idProducto;

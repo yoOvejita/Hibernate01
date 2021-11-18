@@ -3,6 +3,7 @@
   <persistence-unit name="br.com.fredericci.pu">
     <description>Hibernate EntityManager Demo</description>
     <class>com.proyecto.proyectohibernate1.Producto</class>
+    <class>com.proyecto.proyectohibernate1.RegistroVenta</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
