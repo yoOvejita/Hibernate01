@@ -59,5 +59,13 @@ public class Producto {
     public void setPrecio_unitario(float precio_unitario) {
         this.precio_unitario = precio_unitario;
     }
-      
+
+    public Set<RegistroVenta> getRegistros() {
+        return registros;
+    }
+
+    public void setRegistros(Set<RegistroVenta> registros) {
+        this.registros = registros;
+    }
+    
 }

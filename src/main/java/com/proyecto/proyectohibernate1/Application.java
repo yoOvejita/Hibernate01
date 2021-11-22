@@ -2,6 +2,7 @@ package com.proyecto.proyectohibernate1;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -13,11 +14,23 @@ public class Application {
     public static void main(String[] args) throws SQLException {
         //ejemploRegistro();
         //ejemploLecturaDeTabla();
-        ejemploLecturaDeTablaRelacionada();
-
+        //ejemploLecturaDeTablaRelacionada();
         
-
+        //ejemploIntervalos(20f, 100f);
+        //ejemploUsoLike("registro");
+        //ejemploOrdenamiento(true);
+        //ejemploOrdenamiento(false);
+        
+        //ejemploLeerUnRegistro(4);
+        //ejemploDeLimiteDeRegistroa(3);
+        //ejemploConsultaPorFecha(15, 8, 2020);
+        //ejemploSumatoria();
+        //ejemploCount();
+        //ejemploMaxMin(true);
+        //ejemploMedia();
+        ejemploProyeccion();
     }
+    
     
     public static void ejemploLecturaDeTablaRelacionada(){
         final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("br.com.fredericci.pu");
@@ -32,6 +45,14 @@ public class Application {
                     + r.getProductoRelaciondo().getCodigo() + ", "
                     + r.getProductoRelaciondo().getDescripcion());
         
+        for(RegistroVenta r : registrosV){
+            Set<RegistroVenta> temp = null;
+            temp = r.getProductoRelaciondo().getRegistros();
+            System.out.println(r.getProductoRelaciondo().getCodigo() + "******************");
+            for(RegistroVenta rr : temp)
+                System.out.println(rr.getIdregistro_venta()+", "+ rr.getCantidad());
+        }
+            
     }
     public static void ejemploLecturaDeTabla(){
         final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("br.com.fredericci.pu");
@@ -61,6 +82,164 @@ public class Application {
         entityManager.getTransaction().commit();
 
         System.out.println("EXITO");
+    }
+
+    private static void ejemploIntervalos(float minimo, float maximo) {
+        final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("br.com.fredericci.pu");
+        final EntityManager entityManager = entityManagerFactory.createEntityManager();
+        List<Producto> prods = null;
+        Query consulta = entityManager.createQuery("SELECT p FROM Producto p WHERE p.precio_unitario > :numMin AND p.precio_unitario < :numMax");
+        consulta.setParameter("numMin", minimo);
+        consulta.setParameter("numMax", maximo);
+        entityManager.getTransaction().begin();
+        prods = consulta.getResultList();
+        entityManager.getTransaction().commit();
+        
+        for(Producto pp : prods)
+            System.out.println(pp.getCodigo() +": "+ pp.getDescripcion() + "("+pp.getPrecio_unitario()+ ")");
+    }
+
+    private static void ejemploUsoLike(String txt) {
+        final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("br.com.fredericci.pu");
+        final EntityManager entityManager = entityManagerFactory.createEntityManager();
+        List<Producto> prods = null;
+        Query consulta = entityManager.createQuery("SELECT p FROM Producto p WHERE p.descripcion LIKE :texto");
+        consulta.setParameter("texto","%"+txt+"%" );
+        entityManager.getTransaction().begin();
+        prods = consulta.getResultList();
+        entityManager.getTransaction().commit();
+        
+        for(Producto pp : prods)
+            System.out.println(pp.getCodigo() +": "+ pp.getDescripcion() + "("+pp.getPrecio_unitario()+ ")");
+    }
+
+    private static void ejemploOrdenamiento(boolean asc) {
+        final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("br.com.fredericci.pu");
+        final EntityManager entityManager = entityManagerFactory.createEntityManager();
+        List<RegistroVenta> registros = null;
+        Query consulta;
+        if(asc){
+            consulta = entityManager.createQuery("SELECT r FROM RegistroVenta r ORDER BY r.cantidad ASC");
+        }else{
+            consulta = entityManager.createQuery("SELECT r FROM RegistroVenta r ORDER BY r.cantidad DESC");
+        }
+        entityManager.getTransaction().begin();
+        registros = consulta.getResultList();
+        entityManager.getTransaction().commit();
+        
+        for(RegistroVenta rr : registros)
+            System.out.println(rr.getFecha_venta() + ", " + rr.getProductoRelaciondo().getCodigo() + " - " + rr.getCantidad());
+        System.out.println("++++++++++++++++++++++++++++++++++");
+    }
+
+    private static void ejemploLeerUnRegistro(int idProducto) {
+        final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("br.com.fredericci.pu");
+        final EntityManager entityManager = entityManagerFactory.createEntityManager();
+        Producto prod = null;
+        Query consulta = entityManager.createQuery("SELECT p FROM Producto p WHERE p.idProducto = :id");
+        consulta.setParameter("id", idProducto);
+        entityManager.getTransaction().begin();
+        prod = (Producto)consulta.getSingleResult();
+        entityManager.getTransaction().commit();
+        
+        System.out.println(prod.getCodigo() +": "+ prod.getDescripcion() + ", "+prod.getPrecio_unitario());
+    }
+
+    private static void ejemploDeLimiteDeRegistroa(int cantRegistros) {
+        final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("br.com.fredericci.pu");
+        final EntityManager entityManager = entityManagerFactory.createEntityManager();
+        List<Producto> prods = null;
+        Query consulta = entityManager.createQuery("SELECT p FROM Producto p ORDER BY p.precio_unitario DESC");
+        consulta.setMaxResults(cantRegistros);
+        entityManager.getTransaction().begin();
+        prods = consulta.getResultList();
+        entityManager.getTransaction().commit();
+        
+        for(Producto pp : prods)
+            System.out.println(pp.getCodigo() +": "+ pp.getDescripcion() + "("+pp.getPrecio_unitario()+ ")");
+    }
+
+    private static void ejemploConsultaPorFecha(int d, int m, int a) {
+        final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("br.com.fredericci.pu");
+        final EntityManager entityManager = entityManagerFactory.createEntityManager();
+        List<RegistroVenta> registros = null;
+        Query consulta = entityManager.createQuery(
+                "SELECT r FROM RegistroVenta r "
+                + "WHERE day(fecha_venta) = :d AND"
+                + " month(fecha_venta) = :m AND year(fecha_venta) = :a");
+        consulta.setParameter("d", d);
+        consulta.setParameter("m", m);
+        consulta.setParameter("a", a);
+        entityManager.getTransaction().begin();
+        registros = consulta.getResultList();
+        entityManager.getTransaction().commit();
+        
+        for(RegistroVenta rr : registros)
+            System.out.println(rr.getFecha_venta() + ", " + rr.getProductoRelaciondo().getCodigo() + " - " + rr.getCantidad());
+        System.out.println("++++++++++++++++++++++++++++++++++");
+    }
+
+    private static void ejemploSumatoria() {
+        final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("br.com.fredericci.pu");
+        final EntityManager entityManager = entityManagerFactory.createEntityManager();
+        Query consulta = entityManager.createQuery("SELECT SUM(r.cantidad) FROM RegistroVenta r");
+        
+        entityManager.getTransaction().begin();
+        Long cant = (Long)consulta.getResultList().get(0);
+        entityManager.getTransaction().commit();
+        System.out.println("La sumatoria es " + cant);
+    }
+
+    private static void ejemploCount() {
+        final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("br.com.fredericci.pu");
+        final EntityManager entityManager = entityManagerFactory.createEntityManager();
+        Query consulta = entityManager.createQuery("SELECT COUNT(r.idregistro_venta) FROM RegistroVenta r");
+        
+        entityManager.getTransaction().begin();
+        Long cant = (Long)consulta.getResultList().get(0);
+        entityManager.getTransaction().commit();
+        System.out.println("La cantidad es " + cant);
+    }
+
+    private static void ejemploMaxMin(boolean esMax) {
+        final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("br.com.fredericci.pu");
+        final EntityManager entityManager = entityManagerFactory.createEntityManager();
+        Query consulta;
+        if(esMax){
+            consulta = entityManager.createQuery("SELECT MAX(p.precio_unitario) FROM Producto p");
+        }else{
+            consulta = entityManager.createQuery("SELECT MIN(p.precio_unitario) FROM Producto p");
+        }
+        
+        
+        entityManager.getTransaction().begin();
+        Float cant = (Float)consulta.getResultList().get(0);
+        entityManager.getTransaction().commit();
+        System.out.println("El precio "+ (esMax?"maximo":"minimo")+" es " + cant);
+    }
+
+    private static void ejemploMedia() {
+        final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("br.com.fredericci.pu");
+        final EntityManager entityManager = entityManagerFactory.createEntityManager();
+        Query consulta = entityManager.createQuery("SELECT AVG(p.precio_unitario) FROM Producto p");
+        entityManager.getTransaction().begin();
+        Double cant = (Double)consulta.getResultList().get(0);
+        entityManager.getTransaction().commit();
+        System.out.println("La media es " + cant);
+    }
+
+    private static void ejemploProyeccion() {
+        final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("br.com.fredericci.pu");
+        final EntityManager entityManager = entityManagerFactory.createEntityManager();
+        List<ProductoMinimalista> prodsM = null;
+        Query consulta = entityManager.createQuery("SELECT new com.proyecto.proyectohibernate1.ProductoMinimalista(p.codigo, p.precio_unitario) FROM Producto p");
+        entityManager.getTransaction().begin();
+        prodsM = consulta.getResultList();
+        entityManager.getTransaction().commit();
+        
+        for(ProductoMinimalista rr : prodsM)
+            System.out.println(rr.getCodigo() + ", " + rr.getPrecio_unitario());
+        System.out.println("++++++++++++++++++++++++++++++++++");
     }
     
 }
