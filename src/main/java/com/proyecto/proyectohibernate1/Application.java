@@ -1,7 +1,9 @@
 package com.proyecto.proyectohibernate1;
 
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -28,7 +30,13 @@ public class Application {
         //ejemploCount();
         //ejemploMaxMin(true);
         //ejemploMedia();
-        ejemploProyeccion();
+        //ejemploProyeccion();
+        
+        //ejemploConsultaNativaYobjeto();
+        //ejemploLlamadaProcedimientoA();
+        
+        ejemploUsoModeloProducto();
+        
     }
     
     
@@ -240,6 +248,54 @@ public class Application {
         for(ProductoMinimalista rr : prodsM)
             System.out.println(rr.getCodigo() + ", " + rr.getPrecio_unitario());
         System.out.println("++++++++++++++++++++++++++++++++++");
+    }
+
+    private static void ejemploConsultaNativaYobjeto() {
+        final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("br.com.fredericci.pu");
+        final EntityManager entityManager = entityManagerFactory.createEntityManager();
+        List<Object[]> resultado = null;
+        Query consulta = entityManager.createNativeQuery("SELECT precio_unitario, SUM(precio_unitario), COUNT(precio_unitario) FROM producto GROUP BY producto.precio_unitario;");
+        entityManager.getTransaction().begin();
+        resultado = consulta.getResultList();
+        entityManager.getTransaction().commit();
+        
+        for(Object[] o : resultado){
+            String elem1 = o[0].toString();
+            String elem2 = o[1].toString();
+            String elem3 = o[2].toString();
+            float valor1 = Float.parseFloat(elem1);
+            float valor2 = Float.parseFloat(elem2);
+            long valor3 = Long.parseLong(elem3);
+            System.out.println("valor 1: " + valor1 + ", " + valor2 + ", " + valor3);
+        }
+            
+        System.out.println("++++++++++++++++++++++++++++++++++");
+        
+        //SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+        //Date date = formatter.parse(o[1].toString());
+        
+    }
+
+    private static void ejemploLlamadaProcedimientoA() {
+        final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("br.com.fredericci.pu");
+        final EntityManager entityManager = entityManagerFactory.createEntityManager();
+        List<Producto> resultado = null;
+        Query consulta = entityManager.createNativeQuery("{CALL simple_proc()}", Producto.class);
+        entityManager.getTransaction().begin();
+        resultado = consulta.getResultList();
+        entityManager.getTransaction().commit();
+        
+        for(Producto o : resultado){
+            
+            System.out.println("valor 1: " + o.getCodigo() + ", " + o.getDescripcion());
+        }
+    }
+
+    private static void ejemploUsoModeloProducto() {
+        ProductoModelo proM = new ProductoModelo();
+        List<Producto> p = proM.obtenerTodosRegistros();
+        for(Producto pp : p)
+            System.out.println(pp.getCodigo());
     }
     
 }
