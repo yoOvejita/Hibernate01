@@ -35,7 +35,12 @@ public class Application {
         //ejemploConsultaNativaYobjeto();
         //ejemploLlamadaProcedimientoA();
         
-        ejemploUsoModeloProducto();
+        //ejemploUsoModeloProducto();
+        
+        empleado e1 = new empleado();
+        e1.setNombre("Pepe");
+        e1.setApellido("Peralta");
+        ejemploUsoModeloEmpleado(e1);
         
     }
     
@@ -297,5 +302,14 @@ public class Application {
         for(Producto pp : p)
             System.out.println(pp.getCodigo());
     }
-    
+    private static void ejemploUsoModeloEmpleado(empleado em) {
+        //EmpleadoModelo empM = new EmpleadoModelo();
+        //empM.registrar(em);
+        final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("br.com.fredericci.pu");
+        final EntityManager entityManager = entityManagerFactory.createEntityManager();
+        
+        entityManager.getTransaction().begin();
+        entityManager.persist(em);
+        entityManager.getTransaction().commit();
+    }
 }
