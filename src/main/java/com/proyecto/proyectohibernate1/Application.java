@@ -1,5 +1,9 @@
 package com.proyecto.proyectohibernate1;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -38,8 +42,10 @@ public class Application {
         //ejemploUsoModeloProducto();
         
         empleado e1 = new empleado();
-        e1.setNombre("Pepe");
-        e1.setApellido("Peralta");
+        e1.setNombre("P");
+        e1.setApellido(null);
+        //SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+        //el.setFecha(sdf.parse("26-11-2021"));
         ejemploUsoModeloEmpleado(e1);
         
     }
@@ -303,13 +309,21 @@ public class Application {
             System.out.println(pp.getCodigo());
     }
     private static void ejemploUsoModeloEmpleado(empleado em) {
-        //EmpleadoModelo empM = new EmpleadoModelo();
-        //empM.registrar(em);
-        final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("br.com.fredericci.pu");
-        final EntityManager entityManager = entityManagerFactory.createEntityManager();
+        EmpleadoModelo empM = new EmpleadoModelo();
         
-        entityManager.getTransaction().begin();
-        entityManager.persist(em);
-        entityManager.getTransaction().commit();
+        ValidatorFactory vf = Validation.buildDefaultValidatorFactory();
+        Validator v = vf.getValidator();
+        Set<ConstraintViolation<empleado>> conjuntoDeFaltas = v.validate(em);
+        if(!conjuntoDeFaltas.isEmpty()){
+            for(ConstraintViolation<empleado> falta : conjuntoDeFaltas){
+                System.out.println(falta.getPropertyPath()+": "+ falta.getMessage());
+               
+                
+            }
+        }else{
+            empM.registrar(em);
+        }
+        
+
     }
 }

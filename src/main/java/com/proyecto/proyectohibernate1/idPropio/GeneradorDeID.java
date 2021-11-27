@@ -20,7 +20,7 @@ public class GeneradorDeID implements IdentifierGenerator{
     @Override
     public Serializable generate(SharedSessionContractImplementor ssci, Object o) throws HibernateException {
         try{
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-mm-ss");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-hh-mm-ss");
             String cad = sdf.format(new Date());
             return cad;
         }catch(Exception e){

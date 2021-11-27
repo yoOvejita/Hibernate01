@@ -4,11 +4,15 @@
  */
 package com.proyecto.proyectohibernate1;
 
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.URL;
 
 /**
  *
@@ -20,8 +24,11 @@ public class empleado implements Serializable{
     @GenericGenerator(name= "miGenerador", strategy="com.proyecto.proyectohibernate1.idPropio.GeneradorDeID")
     @GeneratedValue(generator = "miGenerador")
     private String id;
-    
+    @Length(min = 3, max = 200)
+    @URL
     private String nombre;
+    @NotNull
+    @Email
     private String apellido;
 
     public empleado() {

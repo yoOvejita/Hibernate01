@@ -4,6 +4,7 @@
  */
 package com.proyecto.proyectohibernate1;
 
+import jakarta.validation.constraints.Past;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,6 +27,7 @@ public class RegistroVenta {//Producto 1 ----- n RegistroVenta
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int idregistro_venta;
     //@Column(name = "fecha_venta")
+    @Past
     private Date fecha_venta;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idprod", nullable = false)

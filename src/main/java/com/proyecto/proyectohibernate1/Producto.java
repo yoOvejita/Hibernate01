@@ -4,6 +4,8 @@
  */
 package com.proyecto.proyectohibernate1;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.Entity;
@@ -24,6 +26,8 @@ public class Producto {
       private int idProducto;
       private String descripcion;
       private String codigo;
+      @Min(100)
+      @Max(8000)
       private float precio_unitario;
       @OneToMany(fetch = FetchType.LAZY, mappedBy = "productoRelaciondo")
       private Set<RegistroVenta> registros = new HashSet<RegistroVenta>(0);
